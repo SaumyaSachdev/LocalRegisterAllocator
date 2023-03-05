@@ -1,11 +1,15 @@
 package alloc;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Instruction {
     String opcode;
     String[] sources;
     String[] targets;
     int numRegs;
     int lineNumber;
+    Set<String> liveRegs = new HashSet<>();
 
     Instruction(String opcode, String[] sources, String[] targets, int numRegs) {
         this.opcode = opcode;
@@ -20,6 +24,10 @@ public class Instruction {
         if (targets != null) {
             str += "\ttargets: ";
             str += (this.targets.length == 2) ? (this.targets[0] + " " + this.targets[1]) : (this.targets[0]);    
+        }
+        str += "\t live regs: ";
+        for (String s : this.liveRegs) {
+            str += s + "\t";
         }
         return str;   
     }

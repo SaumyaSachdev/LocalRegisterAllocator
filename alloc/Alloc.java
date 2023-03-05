@@ -40,6 +40,7 @@ public class Alloc {
         }
         getInputInstructions(inputFile);
         getRegistersAndNextUse();
+        getLiveRegs();
     }
 
     private static void getInputInstructions(File inputFile) {
@@ -61,7 +62,7 @@ public class Alloc {
 
     private static void getRegistersAndNextUse() {
         for (Instruction inst : input) {
-            System.out.println(inst.toString());
+            // System.out.println(inst.toString());
             
             // check if sources and targets exist in virtual regs
             for (int i=0; i<inst.sources.length; i++) {
@@ -105,6 +106,48 @@ public class Alloc {
 
         for (var reg : virtualRegs.entrySet()) {
             System.out.println(reg.getValue());
+        }
+    }
+
+    private static void getLiveRegs() {
+        // input.get(0).liveRegs.add("r1");
+        // input.get(0).liveRegs.add("r2");
+        for (Instruction inst : input) {
+            for (int i=0; i<inst.sources.length; i++) {
+                if (inst.sources[i].startsWith("r")) {
+                    inst.liveRegs.add(inst.sources[i]);
+                }
+            }
+            if (inst.targets != null) {
+                for (int i=0; i<inst.targets.length; i++) {
+                    if (inst.targets[i].startsWith("r")) {
+                        inst.liveRegs.add(inst.targets[i]);
+                    }
+                }
+            }
+            
+            
+            // inst.liveRegs.add(inst.sources[0]);
+            // if (inst.sources.length == 2) {
+            //     inst.liveRegs.add(inst.sources[1]);
+            // } 
+            // if (inst.targets != null) {
+            //     inst.liveRegs.add(inst.targets[0]);
+            //     if (inst.targets.length == 2) {
+            //         inst.liveRegs.add(inst.targets[1]);
+            //     }
+            // }
+            for (Iterator<String> iterator = inst.liveRegs.iterator(); iterator.hasNext();) {
+                String str = iterator.next();
+                if (virtualRegs.containsKey(str)) {
+                    if (virtualRegs.get(str).lastUse == inst.lineNumber) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+        for (Instruction inst : input) {
+            System.out.println(inst.toString());;
         }
     }
 }
