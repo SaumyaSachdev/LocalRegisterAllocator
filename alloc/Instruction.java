@@ -1,5 +1,6 @@
 package alloc;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class Instruction {
     public String toString() {
         String str = "line number: " + lineNumber + "\topcode: " + opcode + "\tnum regs: " + numRegs + "\tsources: ";
         str += (this.sources.length == 2) ? (this.sources[0] + " " + this.sources[1]) : (this.sources[0]);
-        if (targets != null) {
+        if (this.targets != null) {
             str += "\ttargets: ";
             str += (this.targets.length == 2) ? (this.targets[0] + " " + this.targets[1]) : (this.targets[0]);    
         }
@@ -33,16 +34,52 @@ public class Instruction {
     }
 
     public static Instruction parseInstruction(String instruction) {
-        String[] split = instruction.split("\t");
+        instruction = instruction.replaceAll(",", "");
+        String[] split = instruction.split("\\s+");
         // System.out.println("length: " + split.length);
+        
         String op = split[1];
-        String[] sources = {null, null};
-        String[] targs = {null, null};
+        ArrayList<String> src = new ArrayList<>();
+        ArrayList<String> tar = new ArrayList<>();
+        
         int numRegs = 0;
-        sources = split[2].split(", ");
-        if (split.length == 4) {
-            targs = split[3].substring(split[3].indexOf('>') + 2).split(", ");
+        int flag = 0;
+
+        for (int i=2; i<split.length; i++) {
+            // switch(flag) {
+            //     case 0: sources[0] = split[i];
+            //             flag++;
+            //             break;
+            //     case 1: if (split[i].equals("=>")) {
+            //                 flag += 2;
+            //             } else {
+            //                 sources[1] = split[i];
+            //                 flag++;
+            //             }
+            // }
+            if (split[i].equals("=>")) {
+                flag = 1;
+                continue;
+            } else if (flag == 0) {
+                src.add(split[i]);
+            } else {
+                tar.add(split[i]);
+            }
         }
+        
+        String[] sources = src.toArray(new String[0]);
+        String[] targs = tar.toArray(new String[0]);
+
+        // sources = split[2].split(", ");
+        // System.out.print("sources: ");
+        // for (String s : sources) {
+        //     System.out.print(s);
+        // }
+        // if (split.length == 4) {
+        //     targs = split[3].substring(split[3].indexOf('>') + 2).split(", ");
+        // }
+
+
         // System.out.println("opcode: " + op);
         // for (int i=0; i<split.length; i++) {
         //     System.out.println(split[i]);
@@ -53,7 +90,7 @@ public class Instruction {
             }
             // System.out.println("sources last char: " + sources[i].charAt(sources[i].length()-1));
         }
-        if (split.length == 4) {
+        if (targs != null) {
             for (int i=0; i<targs.length; i++) {
                 // System.out.println("targs length: " + targs.length);
                 if (targs[i].startsWith("r")) {

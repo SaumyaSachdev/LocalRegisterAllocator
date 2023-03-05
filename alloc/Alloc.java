@@ -49,6 +49,8 @@ public class Alloc {
             int i = 1;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith("//") && !line.startsWith("#") && !line.isBlank() && !line.isEmpty()) {
+                    // System.out.println(line);
+                    
                     Instruction temp = Instruction.parseInstruction(line);
                     temp.setLineNumber(i);
                     input.add(temp);
@@ -112,7 +114,11 @@ public class Alloc {
     private static void getLiveRegs() {
         // input.get(0).liveRegs.add("r1");
         // input.get(0).liveRegs.add("r2");
-        for (Instruction inst : input) {
+        for (int j=0; j<input.size(); j++) {
+            Instruction inst = input.get(j);
+            if (j != 0) {
+                inst.liveRegs.addAll(input.get(j-1).liveRegs);
+            }
             for (int i=0; i<inst.sources.length; i++) {
                 if (inst.sources[i].startsWith("r")) {
                     inst.liveRegs.add(inst.sources[i]);
@@ -137,6 +143,12 @@ public class Alloc {
             //         inst.liveRegs.add(inst.targets[1]);
             //     }
             // }
+            // System.out.println("live regs: ");
+            // for (String str: inst.liveRegs) {
+            //     System.out.print(str + "\t");
+            // }
+            // System.out.println();
+            
             for (Iterator<String> iterator = inst.liveRegs.iterator(); iterator.hasNext();) {
                 String str = iterator.next();
                 if (virtualRegs.containsKey(str)) {
