@@ -78,7 +78,6 @@ public class Alloc {
 
         for (Register reg : virtualRegs) {
             System.out.println(reg);
-
         }
     }
 }
