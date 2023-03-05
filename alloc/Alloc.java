@@ -67,14 +67,18 @@ public class Alloc {
             for (int i=0; i<inst.sources.length; i++) {
                 String src = inst.sources[i];
                 if (src.startsWith("r")  && !virtualRegs.containsKey(src)) {
-                    virtualRegs.put(src, new Register(src, inst.lineNumber));
+                    virtualRegs.put(src, new Register(src, inst.lineNumber, inst.lineNumber));
                 } else if (virtualRegs.containsKey(src)) {
+                    // update next use if register already exists
                     Register reg = virtualRegs.get(src);
+                    virtualRegs.remove(src);
                     if (reg.nextUse == 0) {
-                        virtualRegs.remove(src);
+                        // virtualRegs.remove(src);
                         reg.setNextUse(inst.lineNumber);
-                        virtualRegs.put(src, reg);
-                    }
+                        // virtualRegs.put(src, reg);
+                    } 
+                    reg.setLastUse(inst.lineNumber);
+                    virtualRegs.put(src, reg);
                 }
             }
 
@@ -82,14 +86,18 @@ public class Alloc {
                 for (int i=0; i<inst.targets.length; i++) {
                     String targ = inst.targets[i];
                     if (targ.startsWith("r")  && !virtualRegs.containsKey(targ)) {
-                        virtualRegs.put(targ, new Register(targ, inst.lineNumber));
+                        virtualRegs.put(targ, new Register(targ, inst.lineNumber, inst.lineNumber));
                     } else if (virtualRegs.containsKey(targ)) {
+                        // update next use if register already exists
                         Register reg = virtualRegs.get(targ);
+                        virtualRegs.remove(targ);
                         if (reg.nextUse == 0) {
-                            virtualRegs.remove(targ);
+                            // virtualRegs.remove(targ);
                             reg.setNextUse(inst.lineNumber);
-                            virtualRegs.put(targ, reg);
+                            // virtualRegs.put(targ, reg);
                         }
+                        reg.setLastUse(inst.lineNumber);
+                        virtualRegs.put(targ, reg);
                     }
                 }    
             }

@@ -6,23 +6,26 @@ public class Register {
     int free;
     int firstUse;
     int nextUse;
+    int lastUse;
     
     Register(String name) {
         this.name = name;
         this.free = 0;
         this.firstUse = 0;
         this.nextUse = 0;
+        this.lastUse = 99999999;
     }
 
-    Register(String name, int firstUse) {
+    Register(String name, int firstUse, int lastUse) {
         this.name = name;
         this.firstUse = firstUse;
         this.nextUse = 0;
         this.free = 0;
+        this.lastUse = lastUse;
     }
 
     public String toString() {
-        return "name: " + this.name + "\t free: " + this.free + "\t first use: " + this.firstUse + "\t next use: " + this.nextUse;
+        return "name: " + this.name + "\t free: " + this.free + "\t first use: " + this.firstUse + "\t next use: " + this.nextUse + "\t last use: " + this.lastUse;
     }
 
     @Override
@@ -55,5 +58,9 @@ public class Register {
 
     public void setNextUse(int lineNumber) {
         this.nextUse = lineNumber;
+    }
+
+    public void setLastUse(int lineNumber) {
+        this.lastUse = lineNumber;
     }
 }
