@@ -3,16 +3,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class Alloc {
 
     static ArrayList<Instruction> input = new ArrayList<>();
-    static Set<Register> virtualRegs = new HashSet<>();
-    static Set<Register> physicalRegs = new HashSet<>();
+
+    static Map<String, Register> virtualRegs = new HashMap<>();
+    static Map<String, Register> physicalRegs = new HashMap<>();
+    // static Set<Register> virtualRegs = new HashSet<>();
+    // static Set<Register> physicalRegs = new HashSet<>();
     public static void main(String[] args) {
         int registers = 0;
         File inputFile = new File(args[1]);
@@ -27,16 +28,21 @@ public class Alloc {
             System.err.println("Input or output file does not exist.");
         } 
         
-        System.out.println("registers: " + registers);
+        // System.out.println("registers: " + registers);
 
         // Register[] physicalRegs = new Register[registers];
         for (int i=0; i<registers; i++) {
-            physicalRegs.add(new Register("r" + (char)(i+97)));
+            physicalRegs.put("r" + (char)(i+97), new Register("r" + (char)(i+97)));
             // physicalRegs[i] = new Register("r" + (char)(i+97));
 
             // physicalRegs[i].name = "r" + (char)(i+97);
             // System.out.println(physicalRegs[i].name);
         }
+        getInputInstructions(inputFile);
+        getRegistersAndNextUse();
+    }
+
+    private static void getInputInstructions(File inputFile) {
         try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
             String line;
             int i = 1;
@@ -51,33 +57,46 @@ public class Alloc {
         } catch(IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private static void getRegistersAndNextUse() {
         for (Instruction inst : input) {
             System.out.println(inst.toString());
             
             // check if sources and targets exist in virtual regs
             for (int i=0; i<inst.sources.length; i++) {
-                if (inst.sources[i].startsWith("r")  && !virtualRegs.contains(new Register(inst.sources[i]))) {
-                    virtualRegs.add(new Register(inst.sources[i], inst.lineNumber));
+                String src = inst.sources[i];
+                if (src.startsWith("r")  && !virtualRegs.containsKey(src)) {
+                    virtualRegs.put(src, new Register(src, inst.lineNumber));
+                } else if (virtualRegs.containsKey(src)) {
+                    Register reg = virtualRegs.get(src);
+                    if (reg.nextUse == 0) {
+                        virtualRegs.remove(src);
+                        reg.setNextUse(inst.lineNumber);
+                        virtualRegs.put(src, reg);
+                    }
                 }
             }
 
             if (inst.targets != null) {
                 for (int i=0; i<inst.targets.length; i++) {
-                    if (inst.targets[i].startsWith("r")  && !virtualRegs.contains(new Register(inst.targets[i]))) {
-                        virtualRegs.add(new Register(inst.targets[i], inst.lineNumber));
+                    String targ = inst.targets[i];
+                    if (targ.startsWith("r")  && !virtualRegs.containsKey(targ)) {
+                        virtualRegs.put(targ, new Register(targ, inst.lineNumber));
+                    } else if (virtualRegs.containsKey(targ)) {
+                        Register reg = virtualRegs.get(targ);
+                        if (reg.nextUse == 0) {
+                            virtualRegs.remove(targ);
+                            reg.setNextUse(inst.lineNumber);
+                            virtualRegs.put(targ, reg);
+                        }
                     }
                 }    
             }
-            // for (int i=0; i<inst.targets.length; i++) {
-            //     if (inst.targets[i].startsWith("r")  && !virtualRegs.contains(new Register(inst.targets[i]))) {
-            //         virtualRegs.add(new Register(inst.targets[i]));
-            //     }
-            // }
         }
 
-        for (Register reg : virtualRegs) {
-            System.out.println(reg);
+        for (var reg : virtualRegs.entrySet()) {
+            System.out.println(reg.getValue());
         }
     }
 }

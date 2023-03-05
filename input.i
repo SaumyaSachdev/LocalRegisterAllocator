@@ -12,5 +12,6 @@
 	add	r1, r10	=> r11
 	loadI	1028	=> r13, r14
 	output	2000
+	add	r13, r1	=> r11
 	output	2004
 	output	2008
