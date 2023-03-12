@@ -3,3 +3,6 @@
 ##############################
 .DS_Store
 *.class
+launch.json
+input.i
+output.i
