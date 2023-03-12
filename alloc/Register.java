@@ -59,8 +59,6 @@ public class Register {
         return reg.name.equals(this.name);
     }
 
-    void getNextUse() {}
-
     public void setNextUse(int lineNumber) {
         this.nextUse = lineNumber;
     }

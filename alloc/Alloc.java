@@ -175,7 +175,8 @@ public class Alloc {
                  * 2. physical regs have space to add register
                  * 3. if no phy regs are free, free one with max nextUse and add spill code
                 **/
-                if (!phyVirMap.containsValue(register)) {
+                Register curr = virtualRegs.get(register);
+                if (!phyVirMap.containsValue(register) && curr.lastUse >= inst.lineNumber) {
                     // check if any register is spilled, insert code to load that register in output file
                     Register virtualReg = virtualRegs.get(register);
                     if (virtualReg.offset != Integer.MAX_VALUE) {
@@ -220,33 +221,9 @@ public class Alloc {
                             Register virReg = virtualRegs.get(register);
                             virReg.allocated = 1;
                             phyVirMap.put(emptiedReg, register);
+                            virtualRegs.put(register, virReg);
                         }
-                    }                   
-
-                    // check if a physical register is empty
-                    // int flag = 0;
-                    // String emptyPhyReg = findEmptyPhyReg();
-                    // System.out.println("////empty reg found: " + emptyPhyReg);
-                    // if (!emptyPhyReg.equals("NULL")) {
-                    //     Register virReg = virtualRegs.get(register);
-                    //     virReg.allocated = 1;
-                    //     // System.out.println("virtual reg: " + virReg);
-                    //     phyVirMap.put(emptyPhyReg, virReg.name);
-                    //     for (Map.Entry<String, String> entry : phyVirMap.entrySet()) {
-                    //         System.out.print("key: " + entry.getKey() + " value: " + entry.getValue() + " \t");
-                    //     }
-                    //     System.out.println();
-                    //     flag = 1;
-                    // }
-
-                    // // no phy registers are free, spill register and add spill code
-                    // if (flag == 0) {
-                    //     // find the allocated registers with the latest next use
-                    //     String emptiedReg = getMaxNextUseAndSpill(bw);
-                    //     Register virReg = virtualRegs.get(register);
-                    //     virReg.allocated = 1;
-                    //     phyVirMap.put(emptiedReg, register);
-                    // }
+                    }
                 }
             }
             // add the instruction to output file with the mappings formed above
@@ -256,7 +233,8 @@ public class Alloc {
             instruction += (inst.targets.length == 2) ? getMappedPhyReg(inst.targets[0]) + ", " + getMappedPhyReg(inst.targets[1]) : getMappedPhyReg(inst.targets[0]);
             System.out.println("write 2: " + instruction);
             bw.append(instruction);
-            bw.newLine();         
+            bw.newLine();
+            // updateRegisterNextUse();         
         }
         bw.close();
     }
