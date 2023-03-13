@@ -22,7 +22,7 @@ public class Instruction {
     public String toString() {
         String str = "line number: " + lineNumber + "\topcode: " + opcode + "\tnum regs: " + numRegs + "\tsources: ";
         str += (this.sources.length == 2) ? (this.sources[0] + " " + this.sources[1]) : (this.sources[0]);
-        if (this.targets != null) {
+        if (this.targets.length > 0) {
             str += "\ttargets: ";
             str += (this.targets.length == 2) ? (this.targets[0] + " " + this.targets[1]) : (this.targets[0]);    
         }
@@ -46,17 +46,6 @@ public class Instruction {
         int flag = 0;
 
         for (int i=2; i<split.length; i++) {
-            // switch(flag) {
-            //     case 0: sources[0] = split[i];
-            //             flag++;
-            //             break;
-            //     case 1: if (split[i].equals("=>")) {
-            //                 flag += 2;
-            //             } else {
-            //                 sources[1] = split[i];
-            //                 flag++;
-            //             }
-            // }
             if (split[i].equals("=>")) {
                 flag = 1;
                 continue;
@@ -70,20 +59,6 @@ public class Instruction {
         String[] sources = src.toArray(new String[0]);
         String[] targs = tar.toArray(new String[0]);
 
-        // sources = split[2].split(", ");
-        // System.out.print("sources: ");
-        // for (String s : sources) {
-        //     System.out.print(s);
-        // }
-        // if (split.length == 4) {
-        //     targs = split[3].substring(split[3].indexOf('>') + 2).split(", ");
-        // }
-
-
-        // System.out.println("opcode: " + op);
-        // for (int i=0; i<split.length; i++) {
-        //     System.out.println(split[i]);
-        // }
         for (int i=0; i<sources.length; i++) {
             if (sources[i].startsWith("r")) {
                 numRegs++;

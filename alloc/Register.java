@@ -16,7 +16,7 @@ public class Register {
         this.firstUse = 0;
         this.nextUse = 0;
         this.lastUse = Integer.MAX_VALUE;
-        // default offset address indicates the register has not been spilled
+        // default offset value indicates the register has not been spilled
         this.offset = Integer.MAX_VALUE;
     }
 
@@ -37,9 +37,6 @@ public class Register {
     public int hashCode() {
         int hash = 23;
         hash = 7 * hash + (name == null ? 0 : name.hashCode());
-        // hash = 7 * hash + free;
-        // hash = 7 * hash + firstUse;
-        // hash = 7 * hash + nextUse;
         return hash;
     }
 

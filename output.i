@@ -1,0 +1,13 @@
+loadI	1028 => rb
+load	rb => rc
+mult	rb, rc => ra
+store rb => 4096
+loadI	5 => rb
+store ra => 4100
+sub	rc, rb => ra
+loadI	8 => rb
+mult	rb, rc => ra
+load 4100 => rb
+sub	rc, rb => ra
+load 4096 => rc
+store	rb => rc
