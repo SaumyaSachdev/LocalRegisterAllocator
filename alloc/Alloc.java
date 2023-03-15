@@ -13,7 +13,6 @@ public class Alloc {
     static ArrayList<Instruction> input = new ArrayList<>();
 
     static Map<String, Register> virtualRegs = new HashMap<>();
-    // static Map<String, Register> physicalRegs = new HashMap<>();
     static Map<String, String> phyVirMap = new HashMap<>();
 
     // registers that are spilled start from the below base address
@@ -41,12 +40,8 @@ public class Alloc {
             }
         }
         
-        // System.out.println("registers: " + registers);
-
-        // Register[] physicalRegs = new Register[registers];
         for (int i=0; i<registers; i++) {
             // add "NULL" as mapping to indicate physical register is empty
-            // System.out.println("*************phy reg:  " + "r" + (char)(i+97));
             phyVirMap.put("r" + (char)(i+97), "NULL");
         }
         getInputInstructions(inputFile);
@@ -65,9 +60,7 @@ public class Alloc {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
-                if (!line.startsWith("//") && !line.startsWith("#") && !line.isBlank() && !line.isEmpty()) {
-                    // System.out.println(line);
-                    
+                if (!line.startsWith("//") && !line.startsWith("#") && !line.isBlank() && !line.isEmpty()) {  
                     Instruction temp = Instruction.parseInstruction(line);
                     temp.setLineNumber(i);
                     input.add(temp);
@@ -110,9 +103,7 @@ public class Alloc {
                         Register reg = virtualRegs.get(targ);
                         virtualRegs.remove(targ);
                         if (reg.nextUse == 0) {
-                            // virtualRegs.remove(targ);
                             reg.setNextUse(inst.lineNumber);
-                            // virtualRegs.put(targ, reg);
                         }
                         reg.setLastUse(inst.lineNumber);
                         virtualRegs.put(targ, reg);
@@ -127,8 +118,6 @@ public class Alloc {
     }
 
     private static void getLiveRegs() {
-        // input.get(0).liveRegs.add("r1");
-        // input.get(0).liveRegs.add("r2");
         for (int j=0; j<input.size(); j++) {
             Instruction inst = input.get(j);
             if (j != 0) {
@@ -197,10 +186,8 @@ public class Alloc {
                         int address = BASE_ADDRESS + virtualReg.offset;
                         String emptyPhyReg = findEmptyPhyReg();
                         if (!emptyPhyReg.equals("NULL")) {
-                            // Register virReg = virtualRegs.get(register);
                             virtualReg.allocated = 1;
                             phyVirMap.put(emptyPhyReg, virtualReg.name);
-                            // flag = 1;
                             
                         } else {
                             // if no empty phy reg found, find a register with max nextUse to spill and add spill code
@@ -214,15 +201,10 @@ public class Alloc {
                         // check if a physical register is empty
                         int flag = 0;
                         String emptyPhyReg = findEmptyPhyReg();
-                        // System.out.println("////empty reg found: " + emptyPhyReg);
                         if (!emptyPhyReg.equals("NULL")) {
                             Register virReg = virtualRegs.get(register);
                             virReg.allocated = 1;
-                            // System.out.println("virtual reg: " + virReg);
                             phyVirMap.put(emptyPhyReg, virReg.name);
-                            // for (Map.Entry<String, String> entry : phyVirMap.entrySet()) {
-                                // System.out.print("key: " + entry.getKey() + " value: " + entry.getValue() + " \t");
-                            // }
                             System.out.println();
                             flag = 1;
                         }
@@ -311,16 +293,13 @@ public class Alloc {
         Register regToSpill = new Register(null);
         String regName = "";
         for (Map.Entry<String, String> entry : phyVirMap.entrySet()) {
-            // String curr = entry.getKey();
             Register currReg = virtualRegs.get(entry.getValue());
-            // System.out.println("current reg: " + currReg);
             if (currReg != null) {
                 if (currReg.nextUse > maxNextUse) {
                     maxNextUse = currReg.nextUse;
                     regToSpill = currReg;
                     // currently assigned physical name for the register
                     regName = entry.getKey();
-                    // System.out.println("reg name update: " + regName);
                 }
             }
         }

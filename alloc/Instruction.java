@@ -36,7 +36,6 @@ public class Instruction {
     public static Instruction parseInstruction(String instruction) {
         instruction = instruction.replaceAll(",", "");
         String[] split = instruction.split("\\s+");
-        // System.out.println("length: " + split.length);
         
         String op = split[1];
         ArrayList<String> src = new ArrayList<>();
@@ -63,21 +62,17 @@ public class Instruction {
             if (sources[i].startsWith("r")) {
                 numRegs++;
             }
-            // System.out.println("sources last char: " + sources[i].charAt(sources[i].length()-1));
         }
         if (targs != null) {
             for (int i=0; i<targs.length; i++) {
-                // System.out.println("targs length: " + targs.length);
                 if (targs[i].startsWith("r")) {
                     numRegs++;
                 }
-                // System.out.println("targs last char: " + targs[i].charAt(targs[i].length()-1));
             }
         } else {
             targs = null;
         }
         
-        // System.out.println("num regs: "+ numRegs);
         return new Instruction(op, sources, targs, numRegs);
     }
 
